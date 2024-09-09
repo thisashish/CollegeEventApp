@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Photos</title>
+    <link rel="stylesheet" href="css/viewPhotos.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <ul>
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="upload.html">Upload Photos</a></li>
+                <li><a href="viewAllPhotos.html">View All Uploaded Photos</a></li>
+            </ul>
+        </aside>
+        <div class="main-content">
+            <h1>Your Uploaded Photos</h1>
+            <div id="photoGallery" class="photo-grid"></div>
+        </div>
+    </div>
+
+    <script src="js/script.js"></script>
+    <script>
+        async function fetchYourPhotos() {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch('http://localhost:5000/api/photos/yourPhotos', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Network response was not ok.');
+                }
+
+                const data = await response.json();
+                const photoGallery = document.getElementById('photoGallery');
+                photoGallery.innerHTML = '';
+
+                data.photos.forEach(photo => {
+                    const photoCard = document.createElement('div');
+                    photoCard.className = 'photo-card';
+                    photoCard.innerHTML = `
+                        <img src="${photo.url}" alt="Photo">
+                        <div class="info">
+                            <p>Category: ${photo.category}</p>
+                            <p>Description: ${photo.description}</p>
+                            <p>Date: ${photo.date}</p>
+                        </div>
+                    `;
+                    photoGallery.appendChild(photoCard);
+                });
+            } catch (error) {
+                console.error('Error fetching your photos:', error);
+                alert('Failed to load your photos. Please try again.');
+            }
+        }
+
+        fetchYourPhotos();
+    </script>
+</body>
+</html>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Photos</title>
+    <link rel="stylesheet" href="css/upload.css">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script> 
+</head>
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <ul>
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="viewPhotos.html">View Your Photos</a></li>
+                <li><a href="viewAllPhotos.html">View All Uploaded Photos</a></li>
+            </ul>
+        </aside>
+        <div class="main-content">
+            <h1>Upload a Photo</h1>
+            <form id="uploadForm" enctype="multipart/form-data">
+                <input type="file" id="photo" name="photo" accept="image/*" required>
+                <input type="text" id="category" name="category" placeholder="Category" required>
+                <textarea id="description" name="description" placeholder="Description" rows="4" required></textarea>
+                <button type="submit">Upload Photo</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/script.js"></script>
+</body>
+</html>

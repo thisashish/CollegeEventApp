@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Uploaded Photos</title>
+    <link rel="stylesheet" href="css/viewAllPhotos.css">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script> <!-- Include Axios -->
+</head>
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <ul>
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="upload.html">Upload Photos</a></li>
+                <li><a href="viewPhotos.html">View Your Photos</a></li>
+            </ul>
+        </aside>
+        <div class="main-content">
+            <h1>All Uploaded Photos</h1>
+            <div id="allPhotosGallery" class="photo-grid"></div>
+        </div>
+    </div>
+
+    <script>
+ async function fetchUserProfilePhoto(userId) {
+    if (!userId) {
+        console.error('No userId provided');
+        return null;
+    }
+
+    try {
+        const response = await axios.get(`http://localhost:5000/api/photos/profilePhoto/${userId}`);
+        const profilePhotoUrl = response.data.profilePhoto || '';
+        return profilePhotoUrl.replace(/\\/g, '/'); // Ensure URL is correctly formatted
+    } catch (error) {
+        console.error('Error fetching user profile photo:', error.message);
+        return null; // Return null if there is an error
+    }
+}
+
+async function fetchAllPhotos() {
+    try {
+        const token = localStorage.getItem('token');
+        const response = await axios.get('http://localhost:5000/api/photos/all', {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        const data = response.data;
+        console.log('Fetched data:', data);
+        const photoGallery = document.getElementById('allPhotosGallery');
+        photoGallery.innerHTML = '';
+
+        for (const photo of data.photos) {
+            const profilePhotoUrl = await fetchUserProfilePhoto(photo.user); // Ensure `photo.user` is a valid userId
+            const photoUrl = photo.url.replace(/\\/g, '/');
+            
+            // Fallback to a default profile photo URL if none is provided
+            const profilePhotoSrc = profilePhotoUrl ? `http://localhost:5000/${profilePhotoUrl}` : 'http://localhost:5000/default-profile-photo.jpg';
+
+            const photoCard = document.createElement('div');
+            photoCard.className = 'photo-card';
+            photoCard.innerHTML = `
+                <img src="http://localhost:5000/${photoUrl}" alt="Photo">
+                <div class="user-profile-photo">
+                    <img src="${profilePhotoSrc}" alt="User Profile Photo">
+                </div>
+                <div class="info">
+                    <p>Category: ${photo.category}</p>
+                    <p>Description: ${photo.description}</p>
+                    <p>Date: ${photo.date}</p>
+                </div>
+            `;
+            photoGallery.appendChild(photoCard);
+        }
+    } catch (error) {
+        console.error('Error fetching photos:', error.message);
+        alert('Failed to load photos. Please try again.');
+    }
+}
+
+fetchAllPhotos();
+
+
+
+
+</script>
+
+    
+</body>
+</html>
