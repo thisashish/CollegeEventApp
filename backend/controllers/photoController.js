@@ -1,58 +1,71 @@
 const Photo = require('../models/photoModel'); 
 const User = require('../models/userModel'); // Your User model
-// Controller to handle photo upload
+
 exports.uploadPhoto = async (req, res) => {
-    try {
+  try {
       const { category, description } = req.body;
-  
-      // Check if file was uploaded
+
+      // Check if the file was uploaded
       if (!req.file) {
-        return res.status(400).json({ message: 'No file uploaded' });
+          return res.status(400).json({ message: 'No file uploaded' });
       }
-  
-      // Create a photo object
+
+      // Ensure req.user is available and the user is authenticated
+      if (!req.user || !req.user._id) {
+          return res.status(401).json({ message: 'User not authenticated' });
+      }
+
+      // Create a photo object and associate the user
       const photo = {
-        url: req.file.path, // Assuming you store the local path; adjust if storing a URL
-        category,
-        description,
-        date: new Date().toLocaleDateString('en-GB') // Format the date as dd/mm/yyyy
+          url: req.file.path, // Path of the uploaded file
+          category,
+          description,
+          date: new Date().toLocaleDateString('en-GB'), // Format date as dd/mm/yyyy
+          user: req.user._id // Set the authenticated user's ID
       };
-  
-      // Save photo to the database
+
+      // Save the photo to the database
       const newPhoto = await Photo.create(photo);
-  
+
       // Respond with success message and photo details
       res.status(201).json({ message: 'Photo uploaded successfully', photo: newPhoto });
-    } catch (error) {
+  } catch (error) {
       // Handle any errors
       res.status(500).json({ message: 'Server error', error: error.message });
-    }
-  };
-
-  // Assuming you are using Mongoose
+  }
+};
 
 
-
-
-
-  
-
-
-// Controller to get all photos
-// exports.getAllPhotos = async (req, res) => {
+// exports.uploadPhoto = async (req, res) => {
 //   try {
-//     // Retrieve all photos from the database
-//     const photos = await Photo.find();
+//       const { category, description } = req.body;
 
-//     // Check if photos were retrieved
-//     if (!photos.length) {
-//       return res.status(404).json({ message: 'No photos found' });
-//     }
+//       // Check if the file was uploaded
+//       if (!req.file) {
+//           return res.status(400).json({ message: 'No file uploaded' });
+//       }
 
-//     // Respond with the retrieved photos
-//     res.status(200).json({ message: 'Photos retrieved successfully', photos });
+//       // Ensure req.user is available and the user is authenticated
+//       if (!req.user || !req.user._id) {
+//           return res.status(401).json({ message: 'User not authenticated' });
+//       }
+
+//       // Create a photo object and associate the user
+//       const photo = {
+//           url: req.file.path, // Path of the uploaded file
+//           category,
+//           description,
+//           date: new Date().toLocaleDateString('en-GB'), // Format date as dd/mm/yyyy
+//           user: req.user._id // Set the authenticated user's ID
+//       };
+
+//       // Save the photo to the database
+//       const newPhoto = await Photo.create(photo);
+
+//       // Respond with success message and photo details
+//       res.status(201).json({ message: 'Photo uploaded successfully', photo: newPhoto });
 //   } catch (error) {
-//     // Handle any errors that occurred
-//     res.status(500).json({ message: 'Server error', error: error.message });
+//       // Handle any errors
+//       res.status(500).json({ message: 'Server error', error: error.message });
 //   }
 // };
