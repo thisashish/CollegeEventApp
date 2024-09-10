@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Profile</title>
+    <link rel="stylesheet" href="css/profilePhoto.css" />
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <ul>
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="upload.html">Upload Photos</a></li>
+                <li><a href="viewPhotos.html">View Your Photos</a></li>
+                <li><a href="profilePhoto.html">Profile Photo</a></li>
+            </ul>
+        </aside>
+        <div class="main-content">
+            <h1>User Profile</h1>
+            <div id="userProfile" class="profile-details"></div>
+        </div>
+    </div>
+
+    <script>
+        async function fetchUserProfile() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const userId = urlParams.get('id');
+
+            if (!userId) {
+                console.error('No user ID provided in URL');
+                return;
+            }
+
+            try {
+                const token = localStorage.getItem("token");
+                const response = await axios.get(
+                    `http://localhost:5000/api/users/${userId}`,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    }
+                );
+
+                const user = response.data.user;
+                const profilePhotoSrc = user.profilePhoto
+                    ? `http://localhost:5000/${user.profilePhoto.replace(/\\/g, "/")}`
+                    : "http://localhost:5000/default-profile-photo.jpg";
+
+                const userProfileDiv = document.getElementById("userProfile");
+                userProfileDiv.innerHTML = `
+                    <img src="${profilePhotoSrc}" alt="Profile Photo">
+                    <div class="user-info">
+                        <p><strong>Name:</strong> ${user.name}</p>
+                        <p><strong>Course:</strong> ${user.course}</p>
+                        <p><strong>College Year:</strong> ${user.collegeYear}</p>
+                        <p><strong>Email:</strong> ${user.email}</p>
+                        <p><strong>Password:</strong> ${user.password}</p> <!-- Consider security here -->
+                    </div>
+                `;
+            } catch (error) {
+                console.error("Error fetching user profile:", error.message);
+                alert("Failed to load user profile. Please try again.");
+            }
+        }
+
+        fetchUserProfile();
+    </script>
+</body>
+</html>

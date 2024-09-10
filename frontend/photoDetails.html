@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Photo Details</title>
+    <link rel="stylesheet" href="css/photoDetails.css" />
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <!-- Include Axios -->
+</head>
+<body>
+    <div class="container">
+        <div id="photoDetails" class="photo-details">
+           
+        </div>
+    </div>
+
+    <script>
+     async function fetchPhotoDetails() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const photoId = urlParams.get('id');
+
+    if (!photoId) {
+        console.error('No photo ID provided in URL');
+        return;
+    }
+
+    try {
+        const token = localStorage.getItem("token");
+        const response = await axios.get(
+            `http://localhost:5000/api/photos/${photoId}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            }
+        );
+
+        const photo = response.data.photo;
+        const photoUrl = photo.url.replace(/\\/g, "/");
+        const profilePhotoSrc = photo.user.profilePhoto
+            ? `http://localhost:5000/${photo.user.profilePhoto.replace(/\\/g, "/")}`
+            : "http://localhost:5000/default-profile-photo.jpg";
+
+        const photoDetailsDiv = document.getElementById("photoDetails");
+        photoDetailsDiv.innerHTML = `
+            <img src="http://localhost:5000/${photoUrl}" alt="Photo">
+            <div class="user-profile-info">
+                <div class="user-profile-photo">
+                    <img src="${profilePhotoSrc}" alt="User Profile Photo">
+                </div>
+                <div class="user-name">${photo.user.name}</div>
+            </div>
+            <div class="description">
+                <p>${photo.description}</p>
+            </div>
+        `;
+    } catch (error) {
+        console.error("Error fetching photo details:", error.message);
+        alert("Failed to load photo details. Please try again.");
+    }
+}
+        fetchPhotoDetails();
+    </script>
+</body>
+</html>

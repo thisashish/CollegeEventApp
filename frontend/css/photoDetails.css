@@ -1,0 +1,80 @@
+/* Ensure smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Basic reset and layout setup */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    color: #333;
+    background-color: #f4f4f4;
+}
+
+/* Container for photo details */
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+/* Photo details styling */
+.photo-details {
+    background-color: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    max-width: 800px;
+    width: 100%;
+}
+
+.photo-details img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.user-profile-info {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-top: 1px solid #ddd;
+}
+
+.user-profile-photo {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    overflow: hidden;
+    margin-right: 10px;
+}
+
+.user-profile-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.user-name {
+    font-size: 16px;
+    color: #333;
+}
+
+.description {
+    padding: 10px;
+    border-top: 1px solid #ddd;
+}
+
+.description p {
+    margin: 0;
+}
+
+/* Media queries for larger screens */
+@media (min-width: 768px) {
+    .photo-details {
+        padding: 20px;
+    }
+}

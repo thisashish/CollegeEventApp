@@ -1,26 +1,83 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
-    <link rel="stylesheet" href="css/dashboard.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>All Uploaded Photos</title>
+    <link rel="stylesheet" href="css/viewAllPhotos.css" />
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 <body>
     <div class="dashboard-container">
         <aside class="sidebar">
             <ul>
+                <li><a href="dashboard.html">Dashboard</a></li>
                 <li><a href="upload.html">Upload Photos</a></li>
                 <li><a href="viewPhotos.html">View Your Photos</a></li>
-                <li><a href="viewAllPhotos.html">View All Uploaded Photos</a></li>
             </ul>
         </aside>
         <div class="main-content">
-            <h1>Welcome to the Dashboard</h1>
-            <p>Select an option from the sidebar.</p>
+            <h1>All Uploaded Photos</h1>
+            <div id="allPhotosGallery" class="photo-grid"></div>
         </div>
     </div>
 
-    <script src="js/script.js"></script>
+    <script>
+        function redirectToLogin() {
+            window.location.href = "login.html"; // Redirect to the login page
+        }
+
+        async function fetchAllPhotos() {
+            const token = localStorage.getItem("token");
+
+            if (!token) {
+                redirectToLogin();
+                return;
+            }
+
+            try {
+                const response = await axios.get(
+                    "http://localhost:5000/api/photos/all",
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    }
+                );
+
+                const data = response.data;
+                console.log("Fetched data:", data);
+                const photoGallery = document.getElementById("allPhotosGallery");
+                photoGallery.innerHTML = "";
+
+                for (const photo of data.photos) {
+                    const photoUrl = photo.url.replace(/\\/g, "/");
+                    const profilePhotoSrc = photo.user.profilePhoto
+                        ? `http://localhost:5000/${photo.user.profilePhoto.replace(/\\/g, "/")}`
+                        : "http://localhost:5000/default-profile-photo.jpg";
+
+                    const photoCard = document.createElement("div");
+                    photoCard.className = "photo-card";
+                    photoCard.innerHTML = `
+                        <a href="photoDetails.html?id=${photo._id}">
+                            <img src="http://localhost:5000/${photoUrl}" alt="Photo">
+                            <div class="user-profile-info">
+                                <div class="user-profile-photo">
+                                    <img src="${profilePhotoSrc}" alt="User Profile Photo">
+                                </div>
+                                <div class="user-name">${photo.user.name}</div>
+                            </div>
+                        </a>
+                    `;
+                    photoGallery.appendChild(photoCard);
+                }
+            } catch (error) {
+                console.error("Error fetching photos:", error.message);
+                alert("Failed to load photos. Please try again.");
+            }
+        }
+
+        fetchAllPhotos();
+    </script>
 </body>
 </html>
